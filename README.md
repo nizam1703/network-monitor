@@ -32,16 +32,3 @@ network-monitor/
 ## Catatan
 
 Pada desain ini, monitoring dipicu oleh dashboard. Jika dashboard ditutup, `ping.php` berhenti dipanggil. Untuk monitoring 24/7, tahap berikutnya adalah memisahkan proses ping menjadi worker/service terjadwal.
-
-## GitHub
-
-```bash
-git init
-git add .
-git commit -m "Initial network monitoring project"
-git branch -M main
-git remote add origin https://github.com/USERNAME/network-monitor.git
-git push -u origin main
-```
-
-`config.php` sudah masuk `.gitignore` dan tidak boleh di-push.
