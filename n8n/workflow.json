@@ -1,0 +1,131 @@
+{
+  "name": "Network Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "network-alert",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "17f571e1-9a01-4826-bbdd-34ce4ebcd73f",
+      "name": "Webhook",
+      "webhookId": "9c72e94e-94ec-44e0-bc4e-e67e9ef3c583"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analisis event jaringan berikut dalam SATU kalimat.\nMaksimal 15 kata.\nGunakan Bahasa Indonesia.\nJangan gunakan daftar atau penjelasan tambahan.\n\nEvent: {{$json.body.event}}\nHost: {{$json.body.host}}\nStatus: {{$json.body.status}}\nLatency: {{$json.body.latency}}\nDuration: {{$json.body.duration_text}}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        288,
+        0
+      ],
+      "id": "5d2bd6f3-6a87-4cbf-a555-2ec170b3f547",
+      "name": "AI Agent",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 3000
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        208
+      ],
+      "id": "61cae8bf-bed2-425b-9c2e-3c85ddbb086b",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "LvejvoxZhs0Rd0QC",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "={{ \n$node[\"Webhook\"].json[\"body\"][\"event\"] === \"INCIDENT\"\n? \"🚨 NETWORK INCIDENT\\n\\nHost: \" +\n$node[\"Webhook\"].json[\"body\"][\"host\"] +\n\"\\nStatus: 🔴 DOWN\" +\n\"\\nWaktu: \" +\n$node[\"Webhook\"].json[\"body\"][\"detected_at\"] +\n\"\\n\\n🤖 Analisis: \" +\n$json.output\n\n: \"✅ NETWORK RECOVERY\\n\\nHost: \" +\n$node[\"Webhook\"].json[\"body\"][\"host\"] +\n\"\\nStatus: 🟢 UP\" +\n\"\\nDowntime: \" +\n$node[\"Webhook\"].json[\"body\"][\"duration_text\"] +\n\"\\nLatency: \" +\n$node[\"Webhook\"].json[\"body\"][\"latency\"] +\n\" ms\\n\\n🤖 Analisis: \" +\n$json.output\n}}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        656,
+        0
+      ],
+      "id": "df0845d0-dd58-4532-a663-ff7b7db8352d",
+      "name": "Send a text message",
+      "webhookId": "1e2d2d6e-0096-41c0-a21f-dfed7f06679f",
+      "credentials": {
+        "telegramApi": {
+          "id": "eRzqfwtalscvF7O0",
+          "name": "Telegram account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "d21fb29f-54c3-4276-93fd-f9e898bbdc04",
+  "nodeGroups": [],
+  "id": "y653GiesVdHSRo59",
+  "tags": []
+}

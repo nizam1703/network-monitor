@@ -13,7 +13,7 @@ network-monitor/
 ├── .gitignore
 ├── README.md
 └── n8n/
-    └── README.md
+    └── worfkflow.json   --> bisa langsung di import pada n8n
 ```
 
 ## Instalasi
